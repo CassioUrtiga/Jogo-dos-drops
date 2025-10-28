@@ -1,0 +1,37 @@
+body{
+    display: flex;
+    justify-content: center;
+    background-color: black;
+}
+
+main{
+    max-width: 1300px;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#atributos{
+    background-color: white;
+    border-radius: 20px;
+    padding: 5px;
+}
+
+#atributos h1{
+    text-align: center;
+    color: black;
+    font-size: 20px;
+}
+
+#display{
+    text-align: left;
+    color: black;
+    font-size: 18px;
+}
+
+#tela{
+    background-image: url(../png/BG/BG.png);
+}
