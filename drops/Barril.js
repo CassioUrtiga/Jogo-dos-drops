@@ -1,13 +1,12 @@
 class Barril{
-    constructor(caneta, personagem1, ambiente, telaWidth, telaHeight){
+    constructor(caneta, getPersonagem, telaWidth, telaHeight){
         this.img1 = new Image();
         this.img2 = new Image();
         this.img1.src = "png/Object/Barrel_1.png"; // reduz tamanho
         this.img2.src = "png/Object/Barrel_2.png"; // aumenta tamanho
 
         this.caneta = caneta;
-        this.personagem1 = personagem1;
-        this.ambiente = ambiente;
+        this.getPersonagem = getPersonagem;
         this.telaWidth = telaWidth;
         this.telaHeight = telaHeight;
 
@@ -15,10 +14,10 @@ class Barril{
         this.tamanhoImagemY = 238;
         this.scale = 0.25;
         this.velocidadeQueda = 3;
-        this.fatorTamanhoPersonagem = 0.1;
+        this.fatorTamanhoPersonagem = 0.025;
 
         this.dadosDisplay = {
-            nome: "Barris",
+            tipo: "Barris",
             modificador: "Tamanho",
             estado: "Normal",
             descricao: "Aumenta ou reduz o tamanho do personagem",
@@ -26,7 +25,7 @@ class Barril{
 
         this.img = null;
         this.barril = null;
-        this.colidirPersonagem1 = false;
+        this.dropColidirPersonagem = false;
 
         this.gerarBarril();
 
@@ -54,30 +53,32 @@ class Barril{
     }
 
     logica(){
+        const personagem = this.getPersonagem();
+        
         // Atualiza a posição da caixa de colisão
         this.rect.x = this.posX;
         this.rect.y = this.posY;
 
         // Atualiza o drop da colisão com o personagem
-        this.colidirPersonagem1 = false;
+        this.dropColidirPersonagem = false;
 
         // Verifica a colisão
         if (
-            this.rect.x < this.personagem1.rect.x + this.personagem1.rect.width &&
-            this.rect.x + this.rect.width > this.personagem1.rect.x &&
-            this.rect.y < this.personagem1.rect.y + this.personagem1.rect.height &&
-            this.rect.y + this.rect.height > this.personagem1.rect.y
+            this.rect.x < personagem.rect.x + personagem.rect.width &&
+            this.rect.x + this.rect.width > personagem.rect.x &&
+            this.rect.y < personagem.rect.y + personagem.rect.height &&
+            this.rect.y + this.rect.height > personagem.rect.y
         ) {
-            this.colidirPersonagem1 = true;
+            this.dropColidirPersonagem = true;
 
             switch (this.barril) {
                 case 1:
-                    this.personagem1.setScale = this.personagem1.getScale - this.fatorTamanhoPersonagem;
+                    personagem.setScale = personagem.getScale - this.fatorTamanhoPersonagem;
                     this.dadosDisplay.estado = "Diminuiu";
                     this.gerarBarril();
                     break;
                 case 2:
-                    this.personagem1.setScale = this.personagem1.getScale + this.fatorTamanhoPersonagem;
+                    personagem.setScale = personagem.getScale + this.fatorTamanhoPersonagem;
                     this.dadosDisplay.estado = "Aumentou";
                     this.gerarBarril();
                     break;
@@ -121,7 +122,7 @@ class Barril{
         return this.dadosDisplay;
     }
 
-    get getColidirPersonagem1(){
-        return this.colidirPersonagem1;
+    get getDropColidirPersonagem(){
+        return this.dropColidirPersonagem;
     }
 }

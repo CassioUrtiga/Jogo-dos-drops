@@ -1,45 +1,52 @@
 class Drops{
-    constructor(caneta, personagem1, ambiente){
+    constructor(caneta, personagens, terreno){
         const tela = document.getElementById("tela");
         this.telaWidth = tela.width;
         this.telaHeight = tela.height;
 
-        this.ambiente = ambiente;
+        this.terreno = terreno;
+        this.personagens = personagens;
 
         this.drops = [
-            () => new Cogumelo(caneta, personagem1, ambiente, this.telaWidth, this.telaHeight),
-            () => new Barril(caneta, personagem1, ambiente, this.telaWidth, this.telaHeight),
-            () => new Caixa(caneta, personagem1, ambiente, this.telaWidth, this.telaHeight),
-            () => new Placa(caneta, personagem1, ambiente, this.telaWidth, this.telaHeight),
+            () => new Cogumelo(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
+            () => new Barril(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
+            () => new Caixa(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
+            () => new Placa(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
         ]
 
         this.dropAtual = this.gerarNovoDrop();
 
-        this.display = new Display(this.dropAtual);
+        this.display = new Display(this.dropAtual, this.personagens.getPersonagem.getDescricao);
     }
 
     desenhar() {
         const drop = this.dropAtual;
+
         const dropColidirPiso = this.colidirPiso(drop.getPosY, drop.getTamanhoImagemY, drop.getScale);
-        const dropColidirPersonagem1 = drop.getColidirPersonagem1;
+
+        const dropColidirPersonagem = drop.getDropColidirPersonagem;
+
+        this.display.setPersonagemDisplay = this.personagens.getPersonagem.getDescricao;
 
         if (
             dropColidirPiso || 
-            dropColidirPersonagem1
+            dropColidirPersonagem
         ){
-            if (dropColidirPersonagem1){
+            if (dropColidirPersonagem){
+                this.personagens.getPersonagem.setDropTipo = drop.getDisplay.tipo;
                 this.display.setDropDisplay = drop.getDisplay;
-                this.display.desenhar();
             }
             
             this.dropAtual = this.gerarNovoDrop();
         }else{
             drop.desenhar();
         }
+
+        this.display.desenhar();
     }
 
     colidirPiso(posY, tamanhoImagemY, scale){
-        if (posY > this.telaHeight - (this.ambiente.getTamImgY * this.ambiente.getScale) - (tamanhoImagemY * scale)) {
+        if (posY > this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (tamanhoImagemY * scale)) {
             return true;
         }
 

@@ -5,7 +5,7 @@ body{
 }
 
 main{
-    max-width: 1300px;
+    max-width: 1250px;
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row-reverse;
@@ -20,16 +20,20 @@ main{
     padding: 5px;
 }
 
+#atributos div{
+    margin: 5px 0px;
+    text-align: left;
+    color: black;
+    font-size: 17px;
+    border: 2px solid black;
+    border-radius: 20px;
+    padding: 10px;
+}
+
 #atributos h1{
     text-align: center;
     color: black;
     font-size: 20px;
-}
-
-#display{
-    text-align: left;
-    color: black;
-    font-size: 18px;
 }
 
 #tela{

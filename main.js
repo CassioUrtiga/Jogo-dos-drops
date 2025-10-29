@@ -52,15 +52,15 @@ function keyPressed(evt){
     return String.fromCharCode(key); 
 }
 
-let ambiente = new Ambiente(caneta);
-let personagem1 = new Personagem1(caneta, ambiente, teclado);
-let drops= new Drops(caneta, personagem1, ambiente);
+let terreno = new Terreno(caneta);
+let personagens = new Personagens(caneta, terreno, teclado);
+let drops= new Drops(caneta, personagens, terreno);
 
 function inicializar(){
     caneta.clearRect(0, 0, canvas.width, canvas.height);
 
-    personagem1.desenhar();
-    ambiente.desenhar();
+    terreno.desenhar();
+    personagens.desenhar();
     drops.desenhar();
     
     requestAnimationFrame(inicializar)
