@@ -1,13 +1,12 @@
 class Cogumelo{
-    constructor(caneta, personagem1, ambiente, telaWidth, telaHeight){
+    constructor(caneta, getPersonagem, telaWidth, telaHeight){
         this.img1 = new Image();
         this.img2 = new Image();
         this.img1.src = "png/Object/Mushroom_1.png"; // reduz velocidade
         this.img2.src = "png/Object/Mushroom_2.png"; // aumenta velocidade
 
         this.caneta = caneta;
-        this.personagem1 = personagem1;
-        this.ambiente = ambiente;
+        this.getPersonagem = getPersonagem;
         this.telaWidth = telaWidth;
         this.telaHeight = telaHeight;
  
@@ -19,12 +18,12 @@ class Cogumelo{
 
         this.img = null;
         this.cogumelo = null;
-        this.colidirPersonagem1 = false;
+        this.dropColidirPersonagem = false;
 
         this.gerarCogumelo();
 
         this.dadosDisplay = {
-            nome: "Cogumelos",
+            tipo: "Cogumelos",
             modificador: "Velocidade",
             estado: "Normal",
             descricao: "Aumenta ou reduz a velocidade do personagem",
@@ -54,30 +53,32 @@ class Cogumelo{
     }
 
     logica(){
+        const personagem = this.getPersonagem();
+        
         // Atualiza a posição da caixa de colisão
         this.rect.x = this.posX;
         this.rect.y = this.posY;
 
         // Atualiza o drop da colisão com o personagem
-        this.colidirPersonagem1 = false;
+        this.dropColidirPersonagem = false;
 
         // Verifica a colisão
         if (
-            this.rect.x < this.personagem1.rect.x + this.personagem1.rect.width &&
-            this.rect.x + this.rect.width > this.personagem1.rect.x &&
-            this.rect.y < this.personagem1.rect.y + this.personagem1.rect.height &&
-            this.rect.y + this.rect.height > this.personagem1.rect.y
+            this.rect.x < personagem.rect.x + personagem.rect.width &&
+            this.rect.x + this.rect.width > personagem.rect.x &&
+            this.rect.y < personagem.rect.y + personagem.rect.height &&
+            this.rect.y + this.rect.height > personagem.rect.y
         ) {
-            this.colidirPersonagem1 = true;
+            this.dropColidirPersonagem = true;
 
             switch (this.cogumelo) {
                 case 1:
-                    this.personagem1.setVelocidade = this.personagem1.getVelocidade - this.fatorVelocidadePersonagem;
+                    personagem.setVelocidade = personagem.getVelocidade - this.fatorVelocidadePersonagem;
                     this.dadosDisplay.estado = "Diminuiu";
                     this.gerarCogumelo();
                     break;
                 case 2:
-                    this.personagem1.setVelocidade = this.personagem1.getVelocidade + this.fatorVelocidadePersonagem;
+                    personagem.setVelocidade = personagem.getVelocidade + this.fatorVelocidadePersonagem;
                     this.dadosDisplay.estado = "Aumentou";
                     this.gerarCogumelo();
                     break;
@@ -121,7 +122,7 @@ class Cogumelo{
         return this.dadosDisplay;
     }
 
-    get getColidirPersonagem1(){
-        return this.colidirPersonagem1;
+    get getDropColidirPersonagem(){
+        return this.dropColidirPersonagem;
     }
 }

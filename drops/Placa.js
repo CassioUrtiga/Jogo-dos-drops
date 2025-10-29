@@ -1,13 +1,12 @@
 class Placa{
-    constructor(caneta, personagem1, ambiente, telaWidth, telaHeight){
+    constructor(caneta, getPersonagem, telaWidth, telaHeight){
         this.img1 = new Image();
         this.img2 = new Image();
         this.img1.src = "png/Object/Sign_1.png"; // normaliza controles
         this.img2.src = "png/Object/Sign_2.png"; // inverte controles
 
         this.caneta = caneta;
-        this.personagem1 = personagem1;
-        this.ambiente = ambiente;
+        this.getPersonagem = getPersonagem;
         this.telaWidth = telaWidth;
         this.telaHeight = telaHeight;
  
@@ -18,12 +17,12 @@ class Placa{
 
         this.img = null;
         this.placa = null;
-        this.colidirPersonagem1 = false;
+        this.dropColidirPersonagem = false;
         
         this.gerarPlaca();
 
         this.dadosDisplay = {
-            nome: "Placas",
+            tipo: "Placas",
             modificador: "Controles",
             estado: "Normal",
             descricao: "Inverte ou normaliza os controles de movimento do personagem",
@@ -38,6 +37,45 @@ class Placa{
         };
     }
 
+    logica(){
+        const personagem = this.getPersonagem();
+
+        // Atualiza a posição da caixa de colisão
+        this.rect.x = this.posX;
+        this.rect.y = this.posY;
+
+        // Atualiza o drop da colisão com o personagem
+        this.dropColidirPersonagem = false;
+
+        // Verifica a colisão
+        if (
+            this.rect.x < personagem.rect.x + personagem.rect.width &&
+            this.rect.x + this.rect.width > personagem.rect.x &&
+            this.rect.y < personagem.rect.y + personagem.rect.height &&
+            this.rect.y + this.rect.height > personagem.rect.y
+        ) {
+            this.dropColidirPersonagem = true;
+
+            switch (this.placa) {
+                case 1:
+                    personagem.setEstadoTeclado = "normal";
+                    this.dadosDisplay.estado = "Normal";
+                    this.gerarPlaca();
+                    break;
+                case 2:
+                    personagem.setEstadoTeclado = "invertRightLeft";
+                    this.dadosDisplay.estado = "Invertidos";
+                    this.gerarPlaca();
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        // Atualiza a velocidade de queda
+        this.posY += this.velocidadeQueda;
+    }
+
     gerarPlaca() {
         if (Math.random() < 0.5) {
             this.img = this.img1;
@@ -50,43 +88,6 @@ class Placa{
         this.posX = Math.random() * (this.telaWidth - this.tamanhoImagemX * this.scale);
 
         this.posY = -this.tamanhoImagemY * this.scale;
-    }
-
-    logica(){
-        // Atualiza a posição da caixa de colisão
-        this.rect.x = this.posX;
-        this.rect.y = this.posY;
-
-        // Atualiza o drop da colisão com o personagem
-        this.colidirPersonagem1 = false;
-
-        // Verifica a colisão
-        if (
-            this.rect.x < this.personagem1.rect.x + this.personagem1.rect.width &&
-            this.rect.x + this.rect.width > this.personagem1.rect.x &&
-            this.rect.y < this.personagem1.rect.y + this.personagem1.rect.height &&
-            this.rect.y + this.rect.height > this.personagem1.rect.y
-        ) {
-            this.colidirPersonagem1 = true;
-
-            switch (this.placa) {
-                case 1:
-                    this.personagem1.setEstadoTeclado = "normal";
-                    this.dadosDisplay.estado = "Normal";
-                    this.gerarPlaca();
-                    break;
-                case 2:
-                    this.personagem1.setEstadoTeclado = "invertRightLeft";
-                    this.dadosDisplay.estado = "Invertidos";
-                    this.gerarPlaca();
-                    break;
-                default:
-                    break;
-            }
-        }
-        
-        // Atualiza a velocidade de queda
-        this.posY += this.velocidadeQueda;
     }
 
     desenhar() {
@@ -120,7 +121,7 @@ class Placa{
         return this.dadosDisplay;
     }
 
-    get getColidirPersonagem1(){
-        return this.colidirPersonagem1;
+    get getDropColidirPersonagem(){
+        return this.dropColidirPersonagem;
     }
 }

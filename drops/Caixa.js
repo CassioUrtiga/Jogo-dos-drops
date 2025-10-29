@@ -1,11 +1,10 @@
 class Caixa{
-    constructor(caneta, personagem1, ambiente, telaWidth, telaHeight){
+    constructor(caneta, getPersonagem, telaWidth, telaHeight){
         this.img = new Image();
         this.img.src = "png/Object/Crate.png"; // troca o personagem
 
         this.caneta = caneta;
-        this.personagem1 = personagem1;
-        this.ambiente = ambiente;
+        this.getPersonagem = getPersonagem;
         this.telaWidth = telaWidth;
         this.telaHeight = telaHeight;
  
@@ -15,13 +14,13 @@ class Caixa{
         this.velocidadeQueda = 3.5;
 
         this.dadosDisplay = {
-            nome: "Caixa",
+            tipo: "Caixa",
             modificador: "Personagem",
             estado: "Normal",
             descricao: "Troca o personagem para outro com novas habilidades, use a tecla de espaço para usar a habilidade",
         }
 
-        this.colidirPersonagem1 = false;
+        this.dropColidirPersonagem = false;
 
         this.gerarCaixa();
 
@@ -41,21 +40,23 @@ class Caixa{
     }
 
     logica(){
+        const personagem = this.getPersonagem();
+        
         // Atualiza a posição da caixa de colisão
         this.rect.x = this.posX;
         this.rect.y = this.posY;
 
         // Atualiza o drop da colisão com o personagem
-        this.colidirPersonagem1 = false;
+        this.dropColidirPersonagem = false;
 
         // Verifica a colisão
         if (
-            this.rect.x < this.personagem1.rect.x + this.personagem1.rect.width &&
-            this.rect.x + this.rect.width > this.personagem1.rect.x &&
-            this.rect.y < this.personagem1.rect.y + this.personagem1.rect.height &&
-            this.rect.y + this.rect.height > this.personagem1.rect.y
+            this.rect.x < personagem.rect.x + personagem.rect.width &&
+            this.rect.x + this.rect.width > personagem.rect.x &&
+            this.rect.y < personagem.rect.y + personagem.rect.height &&
+            this.rect.y + this.rect.height > personagem.rect.y
         ) {
-            this.colidirPersonagem1 = true;
+            this.dropColidirPersonagem = true;
             this.dadosDisplay.estado= "Trocou o personagem";
             this.gerarCaixa();
         }
@@ -95,7 +96,7 @@ class Caixa{
         return this.dadosDisplay;
     }
 
-    get getColidirPersonagem1(){
-        return this.colidirPersonagem1;
+    get getDropColidirPersonagem(){
+        return this.dropColidirPersonagem;
     }
 }

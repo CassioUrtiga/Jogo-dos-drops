@@ -1,4 +1,4 @@
-class Personagem1{
+class Personagem3{
 
     constructor(caneta, teclado, terreno){
         const tela = document.getElementById("tela");
@@ -6,7 +6,7 @@ class Personagem1{
 
         this.telaWidth = tela.width;
         this.telaHeight = tela.height;
-        this.img.src = "png/sprites/personagem1.png";
+        this.img.src = "png/sprites/personagem3.png";
 
         this.teclado = teclado;
         this.caneta = caneta;
@@ -18,8 +18,8 @@ class Personagem1{
         this.scale = 0.6;
 
         this.descricao = {
-            tipo: "Comum",
-            habilidade: "Nenhuma",
+            tipo: "Preto",
+            habilidade: "preto",
         }
         
         this.estado = -1; // guarda o estado atual do sprite
@@ -216,7 +216,6 @@ class Personagem1{
         this.rect.x = this.x;
         this.rect.y = this.y;
     }
-
 
     set setVelocidade(velocidade){
         if (velocidade <= 0){

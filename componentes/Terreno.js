@@ -1,4 +1,4 @@
-class Ambiente {
+class Terreno {
     constructor(caneta) {
         this.caneta = caneta;
         const tela = document.getElementById("tela");
