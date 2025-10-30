@@ -5,22 +5,26 @@ const teclado = {
     cima: false,
     baixo: false,
     direita: false,
-    esquerda: false
+    esquerda: false,
+    space: false,
 }
 
 window.addEventListener('keydown', (evt) =>{
     switch (keyPressed(evt)){
         case '&':
-            teclado.cima=true;
+            teclado.cima = true;
             break;
         case '(':
-            teclado.baixo=true;
+            teclado.baixo = true;
             break;
         case "'":
-            teclado.direita=true;
+            teclado.direita = true;
             break;
         case '%':
-            teclado.esquerda=true;
+            teclado.esquerda = true;
+            break;
+        case ' ':
+            teclado.space = true;
             break;
         default:
             break;
@@ -30,16 +34,19 @@ window.addEventListener('keydown', (evt) =>{
 window.addEventListener('keyup', (evt) =>{
     switch (keyPressed(evt)){
         case '&':
-            teclado.cima=false;
+            teclado.cima = false;
             break;
         case '(':
-            teclado.baixo=false;
+            teclado.baixo = false;
             break;
         case "'":
-            teclado.direita=false;
+            teclado.direita = false;
             break;
         case '%':
-            teclado.esquerda=false;
+            teclado.esquerda = false;
+            break;
+        case ' ':
+            teclado.space = false;
             break;
         default:
             break;
@@ -51,6 +58,21 @@ function keyPressed(evt){
     var key = evt.keyCode || evt.which;
     return String.fromCharCode(key); 
 }
+
+function ajustarCanvas() {
+    const atributos = document.getElementById("atributos");
+
+    const tamanhoDisplayWidth = atributos.offsetWidth;
+    const tamanhoDisplayHeight = atributos.offsetHeight;
+
+    canvas.width = window.innerWidth - tamanhoDisplayWidth - 100;
+    canvas.height = window.innerHeight - tamanhoDisplayHeight;
+}
+
+
+// ============ Inicialização do jogo ============
+
+ajustarCanvas();
 
 let terreno = new Terreno(caneta);
 let personagens = new Personagens(caneta, terreno, teclado);

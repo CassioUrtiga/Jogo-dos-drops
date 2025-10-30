@@ -37,24 +37,16 @@ class Personagens{
         personagensRestantes.splice(this.indiceAtual, 1);
         const novoIndice = Math.floor(Math.random() * personagensRestantes.length);
 
-        // Atualiza o índice real (baseado na lista original)
         this.indiceAtual = (novoIndice >= this.indiceAtual) ? novoIndice + 1 : novoIndice;
 
         const novoPersonagem = this.personagens[this.indiceAtual]();
-
-        // --- mantém posição e escala do personagem anterior ---
         const antigo = this.personagemAtual;
 
-        // Mantém escala
         novoPersonagem.setScale = antigo.getScale;
 
-        // Calcula a base do personagem antigo (y + altura real)
         const baseAntiga = antigo.getPosY + (antigo.getImgY * antigo.getScale);
-
-        // Calcula a nova altura
         const novaAltura = novoPersonagem.getImgY * novoPersonagem.getScale;
 
-        // Reposiciona o novo personagem para manter os pés no mesmo lugar
         novoPersonagem.setPosX = antigo.getPosX;
         novoPersonagem.setPosY = baseAntiga - novaAltura;
 

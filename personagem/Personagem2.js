@@ -16,6 +16,7 @@ class Personagem2{
         this.imgY = 130;
         this.velocidade = 1.5;
         this.scale = 0.6;
+        this.alturaPulo = 5;
 
         this.descricao = {
             tipo: "Zumbi",
