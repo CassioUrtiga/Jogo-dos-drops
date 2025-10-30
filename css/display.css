@@ -2,26 +2,32 @@ body{
     display: flex;
     justify-content: center;
     background-color: black;
+    overflow-y: hidden;
 }
 
 main{
-    max-width: 1250px;
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row-reverse;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 0px 10px;
+    height: 100vh;
 }
 
 #atributos{
+    max-width: 250px;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
     background-color: white;
     border-radius: 20px;
     padding: 5px;
+    gap: 8px 0px;
 }
 
 #atributos div{
-    margin: 5px 0px;
     text-align: left;
     color: black;
     font-size: 17px;
