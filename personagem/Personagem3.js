@@ -18,11 +18,10 @@ class Personagem3{
         this.scale = 0.6;
 
         this.descricao = {
-            tipo: "Preto",
-            habilidade: "preto",
+            tipo: "Ninja",
+            habilidade: "Pular",
         }
         
-        this.estado = -1; // guarda o estado atual do sprite
         this.numSprite = 0; // número do sprite atual
         this.alternaSprite = 0; // alterna entre o eixo x do sprite
         this.contadorAtraso = 0;
@@ -31,6 +30,31 @@ class Personagem3{
 
         this.x = (this.telaWidth / 2) - ((this.imgX * this.scale) / 2);
         this.y = this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (this.imgY * this.scale);
+
+        // Dados dos sprites
+        this.sprites = {
+            estadoAtual : 0, // parado(0), Dir(2), Esq(-2)
+            indoDireita: {
+                altura: 130,
+                totalSprites: 10,
+                atraso: 5,
+            },
+            indoEsquerda: {
+                altura: 390,
+                totalSprites: 10,
+                atraso: 5,
+            },
+            paradoDireita: {
+                altura: 0,
+                totalSprites: 15,
+                atraso: 5,
+            },
+            paradoEsquerda: {
+                altura: 260,
+                totalSprites: 15,
+                atraso: 5,
+            },
+        }
 
         // Caixa de colisão
         this.rect = { 
@@ -48,11 +72,49 @@ class Personagem3{
 
         //animação multimovimento
         if (this.teclado.direita && this.teclado.esquerda){
-            this.animation(this.img, 50, 3, 0, 120, 130);
+            switch (this.sprites.estadoAtual) {
+                case 2:
+                    this.animation(
+                        this.img, 
+                        this.sprites.paradoDireita.atraso, 
+                        this.sprites.paradoDireita.totalSprites, 
+                        this.sprites.paradoDireita.altura, 
+                        this.imgX, 
+                        this.imgY
+                    );
+                    break;
+                case -2:
+                    this.animation(
+                        this.img, 
+                        this.sprites.paradoEsquerda.atraso, 
+                        this.sprites.paradoEsquerda.totalSprites, 
+                        this.sprites.paradoEsquerda.altura, 
+                        this.imgX, 
+                        this.imgY
+                    );
+                    break;
+                default:
+                    this.animation(
+                        this.img, 
+                        this.sprites.paradoDireita.atraso, 
+                        this.sprites.paradoDireita.totalSprites, 
+                        this.sprites.paradoDireita.altura, 
+                        this.imgX, 
+                        this.imgY
+                    );
+                    break;
+            }  
         }else{
-            //animação parado de frente
-            if (this.estado == -1){
-                this.animation(this.img, 50, 3, 0, 120, 130);
+            //animação parado (estado inicial)
+            if (this.sprites.estadoAtual == 0){
+                this.animation(
+                    this.img, 
+                    this.sprites.paradoDireita.atraso, 
+                    this.sprites.paradoDireita.totalSprites, 
+                    this.sprites.paradoDireita.altura, 
+                    this.imgX, 
+                    this.imgY
+                );
             }
 
             switch (this.estadoTeclado) {
@@ -60,43 +122,99 @@ class Personagem3{
                     //animação indo para direita
                     if (this.teclado.direita){
                         this.x += this.velocidade;
-                        this.estado = 2;
-                        this.animation(this.img, 5, 10, 910, 120, 130);
+                        this.sprites.estadoAtual = 2;
+                        this.animation(
+                            this.img, 
+                            this.sprites.indoDireita.atraso, 
+                            this.sprites.indoDireita.totalSprites, 
+                            this.sprites.indoDireita.altura, 
+                            this.imgX, 
+                            this.imgY
+                        );
                     }
                     //animação parado na direita
-                    if (!this.teclado.direita && this.estado == 2){
-                        this.animation(this.img, 50, 3, 0, 120, 130);
+                    if (!this.teclado.direita && this.sprites.estadoAtual == 2){
+                        this.animation(
+                            this.img, 
+                            this.sprites.paradoDireita.atraso, 
+                            this.sprites.paradoDireita.totalSprites, 
+                            this.sprites.paradoDireita.altura, 
+                            this.imgX, 
+                            this.imgY
+                        );
                     }
                     //animação indo para esquerda
                     if (this.teclado.esquerda){
                         this.x -= this.velocidade;
-                        this.estado = -2;
-                        this.animation(this.img, 5, 10, 650, 120, 130);
+                        this.sprites.estadoAtual = -2;
+                        this.animation(
+                            this.img, 
+                            this.sprites.indoEsquerda.atraso, 
+                            this.sprites.indoEsquerda.totalSprites, 
+                            this.sprites.indoEsquerda.altura, 
+                            this.imgX, 
+                            this.imgY
+                        );
                     }
                     //animação parado na esquerda
-                    if (!this.teclado.esquerda && this.estado == -2){
-                        this.animation(this.img, 50, 3, 0, 120, 130);
+                    if (!this.teclado.esquerda && this.sprites.estadoAtual == -2){
+                        this.animation(
+                            this.img, 
+                            this.sprites.paradoEsquerda.atraso, 
+                            this.sprites.paradoEsquerda.totalSprites, 
+                            this.sprites.paradoEsquerda.altura, 
+                            this.imgX, 
+                            this.imgY
+                        );
                     }
                     break;
                 case "invertRightLeft":
                     if (this.teclado.direita) {
                         this.x -= this.velocidade;
-                        this.estado = -2;
-                        this.animation(this.img, 5, 10, 650, 120, 130);
+                        this.sprites.estadoAtual = -2;
+                        this.animation(
+                            this.img, 
+                            this.sprites.indoDireita.atraso, 
+                            this.sprites.indoDireita.totalSprites, 
+                            this.sprites.indoDireita.altura, 
+                            this.imgX, 
+                            this.imgY
+                        );
                     }
 
-                    if (!this.teclado.direita && this.estado == -2) {
-                        this.animation(this.img, 50, 3, 0, 120, 130);
+                    if (!this.teclado.direita && this.sprites.estadoAtual == -2) {
+                        this.animation(
+                            this.img, 
+                            this.sprites.paradoDireita.atraso, 
+                            this.sprites.paradoDireita.totalSprites, 
+                            this.sprites.paradoDireita.altura, 
+                            this.imgX, 
+                            this.imgY
+                        );
                     }
 
                     if (this.teclado.esquerda) {
                         this.x += this.velocidade;
-                        this.estado = 2;
-                        this.animation(this.img, 5, 10, 910, 120, 130);
+                        this.sprites.estadoAtual = 2;
+                        this.animation(
+                            this.img, 
+                            this.sprites.indoEsquerda.atraso, 
+                            this.sprites.indoEsquerda.totalSprites, 
+                            this.sprites.indoEsquerda.altura, 
+                            this.imgX, 
+                            this.imgY
+                        );
                     }
 
-                    if (!this.teclado.esquerda && this.estado == 2) {
-                        this.animation(this.img, 50, 3, 0, 120, 130);
+                    if (!this.teclado.esquerda && this.sprites.estadoAtual == 2) {
+                        this.animation(
+                            this.img, 
+                            this.sprites.paradoEsquerda.atraso, 
+                            this.sprites.paradoEsquerda.totalSprites, 
+                            this.sprites.paradoEsquerda.altura, 
+                            this.imgX, 
+                            this.imgY
+                        );
                     }
                     break;
                 default:
@@ -105,29 +223,36 @@ class Personagem3{
         }
     }
 
-    animation(img, atrasoSprite, totalSprite, ySprite, tamX, tamY){
+    animation(
+        img, 
+        atrasoSprite, 
+        totalSprite, 
+        ySprite, 
+        tamImgX, 
+        tamImgY,
+    ){
         this.contadorAtraso++;
 
-        if (this.contadorAtraso >= atrasoSprite || this.numSprite > totalSprite-1){
-            this.numSprite++;
+        if (this.contadorAtraso >= atrasoSprite || this.numSprite > totalSprite - 1){
+            this.numSprite ++;
             this.contadorAtraso = 0;
 
-            if (this.numSprite > totalSprite-1){
+            if (this.numSprite > totalSprite - 1){
                 this.numSprite = 0;
             }
-            this.alternaSprite = this.numSprite*tamX;
+            this.alternaSprite = this.numSprite * tamImgX;
         }
         
         this.caneta.drawImage(
             img, 
             this.alternaSprite, 
             ySprite, 
-            tamX, 
-            tamY, 
+            tamImgX, 
+            tamImgY, 
             this.x, 
             this.y, 
-            tamX*this.scale, 
-            tamY*this.scale
+            tamImgX * this.scale, 
+            tamImgY * this.scale
         );
     }
 
