@@ -8,9 +8,9 @@ class Personagens{
 
         this.personagens = [
             () => new Personagem1(caneta, teclado, terreno),
-            () => new Personagem2(caneta, teclado, terreno),
-            () => new Personagem3(caneta, teclado, terreno),
-            () => new Personagem4(caneta, teclado, terreno),
+            //() => new Personagem2(caneta, teclado, terreno),
+            //() => new Personagem3(caneta, teclado, terreno),
+            //() => new Personagem4(caneta, teclado, terreno),
         ]
 
         this.indiceAtual = this.personagemPadrao;
