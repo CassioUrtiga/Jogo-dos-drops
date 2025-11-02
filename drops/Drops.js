@@ -8,10 +8,10 @@ class Drops{
         this.personagens = personagens;
 
         this.drops = [
-            //() => new Cogumelo(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
-            //() => new Barril(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
+            () => new Cogumelo(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
+            () => new Barril(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
             () => new Caixa(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
-            //() => new Placa(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
+            () => new Placa(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
         ]
 
         this.dropsLength = this.drops.length;
