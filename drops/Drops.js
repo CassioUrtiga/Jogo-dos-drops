@@ -14,35 +14,40 @@ class Drops{
             () => new Placa(caneta, () => this.personagens.getPersonagem, this.telaWidth, this.telaHeight),
         ]
 
-        this.dropAtual = this.gerarNovoDrop();
-
-        this.display = new Display(this.dropAtual, this.personagens.getPersonagem.getDescricao);
+        this.dropsLength = this.drops.length;
+        
+        if (this.dropsLength !== 0){
+            this.dropAtual = this.gerarNovoDrop();
+            this.display = new Display(this.dropAtual, this.personagens.getPersonagem.getDescricao);
+        }
     }
 
     desenhar() {
-        const drop = this.dropAtual;
+        if (this.dropsLength !== 0){
+            const drop = this.dropAtual;
 
-        const dropColidirPiso = this.colidirPiso(drop.getPosY, drop.getTamanhoImagemY, drop.getScale);
+            const dropColidirPiso = this.colidirPiso(drop.getPosY, drop.getTamanhoImagemY, drop.getScale);
 
-        const dropColidirPersonagem = drop.getDropColidirPersonagem;
+            const dropColidirPersonagem = drop.getDropColidirPersonagem;
 
-        this.display.setPersonagemDisplay = this.personagens.getPersonagem.getDescricao;
+            this.display.setPersonagemDisplay = this.personagens.getPersonagem.getDescricao;
 
-        if (
-            dropColidirPiso || 
-            dropColidirPersonagem
-        ){
-            if (dropColidirPersonagem){
-                this.personagens.getPersonagem.setDropTipo = drop.getDisplay.tipo;
-                this.display.setDropDisplay = drop.getDisplay;
+            if (
+                dropColidirPiso || 
+                dropColidirPersonagem
+            ){
+                if (dropColidirPersonagem){
+                    this.personagens.getPersonagem.setDropTipo = drop.getDisplay.tipo;
+                    this.display.setDropDisplay = drop.getDisplay;
+                }
+                
+                this.dropAtual = this.gerarNovoDrop();
+            }else{
+                drop.desenhar();
             }
-            
-            this.dropAtual = this.gerarNovoDrop();
-        }else{
-            drop.desenhar();
-        }
 
-        this.display.desenhar();
+            this.display.desenhar();
+        }
     }
 
     colidirPiso(posY, tamanhoImagemY, scale){
@@ -54,6 +59,6 @@ class Drops{
     }
 
     gerarNovoDrop() {
-        return this.drops[Math.floor(Math.random() * this.drops.length)]();
+        return this.drops[Math.floor(Math.random() * this.dropsLength)]();
     }
 }
