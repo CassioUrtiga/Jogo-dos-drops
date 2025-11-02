@@ -8,9 +8,8 @@ class Personagens{
 
         this.personagens = [
             () => new Personagem1(caneta, teclado, terreno),
-            //() => new Personagem2(caneta, teclado, terreno),
-            //() => new Personagem3(caneta, teclado, terreno),
-            //() => new Personagem4(caneta, teclado, terreno),
+            () => new Personagem2(caneta, teclado, terreno),
+            () => new Personagem3(caneta, teclado, terreno),
         ]
 
         this.indiceAtual = this.personagemPadrao;
@@ -42,18 +41,35 @@ class Personagens{
         const novoPersonagem = this.personagens[this.indiceAtual]();
         const antigo = this.personagemAtual;
 
-        novoPersonagem.setScale = antigo.getScale;
+        // Ajustar scale e posição assim que as imagens forem carregadas
+        const aplicarPosicao = () => {
+            novoPersonagem.setScale = antigo.getScale;
 
-        const baseAntiga = antigo.getPosY + (antigo.getImgY * antigo.getScale);
-        const novaAltura = novoPersonagem.getImgY * novoPersonagem.getScale;
+            const baseAntiga = antigo.getPosY + (antigo.getImgY * antigo.getScale);
+            const novaAltura = novoPersonagem.getImgY * novoPersonagem.getScale;
 
-        novoPersonagem.setPosX = antigo.getPosX;
-        novoPersonagem.setPosY = baseAntiga - novaAltura;
+            novoPersonagem.setPosX = antigo.getPosX;
+            novoPersonagem.setPosY = baseAntiga - novaAltura;
 
-        novoPersonagem.setDropTipo = "";
+            novoPersonagem.setDropTipo = "";
+        };
+
+        // Se já estiverem carregadas, aplica direto
+        if (novoPersonagem.imagensCarregadas) {
+            aplicarPosicao();
+        } else {
+            // Se ainda não carregou, aplica quando carregar
+            const checarCarregamento = setInterval(() => {
+                if (novoPersonagem.imagensCarregadas) {
+                    clearInterval(checarCarregamento);
+                    aplicarPosicao();
+                }
+            }, 2);
+        }
 
         return novoPersonagem;
     }
+
 
     get getPersonagem(){
         return this.personagemAtual;

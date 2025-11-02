@@ -1,353 +1,202 @@
-class Personagem1{
-
-    constructor(caneta, teclado, terreno){
+class Personagem1 {
+    constructor(caneta, teclado, terreno) {
         const tela = document.getElementById("tela");
-        this.img = new Image();
-
+        this.caneta = caneta;
+        this.teclado = teclado;
+        this.terreno = terreno;
         this.telaWidth = tela.width;
         this.telaHeight = tela.height;
-        this.img.src = "png/sprites/personagem1.png";
 
-        this.teclado = teclado;
-        this.caneta = caneta;
-        this.terreno = terreno;
-
-        this.imgX = 120;
-        this.imgY = 130;
         this.velocidade = 1.5;
-        this.scale = 0.6;
-
-        this.descricao = {
-            tipo: "Comum",
-            habilidade: "Nenhuma",
-        }
-        
-        this.numSprite = 0; // número do sprite atual
-        this.alternaSprite = 0; // alterna entre o eixo x do sprite
-        this.contadorAtraso = 0;
+        this.scale = 0.20;
+        this.descricao = { tipo: "Comum", habilidade: "Nenhuma" };
         this.estadoTeclado = "normal";
-        this.dropTipo = ""; // tipo do drop que colidiu com o personagem
+        this.dropTipo = "";
 
-        this.x = (this.telaWidth / 2) - ((this.imgX * this.scale) / 2);
-        this.y = this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (this.imgY * this.scale);
+        this.frames = {};
+        this.frameSizes = {};
+        this.imagensCarregadas = false;
+        this.frameAtual = null;
+        this.numFrame = 0;
+        this.contadorAtraso = 0;
 
-        // Dados dos sprites
-        this.sprites = {
-            estadoAtual : 0, // parado(0), Dir(2), Esq(-2)
-            indoDireita: {
-                altura: 130,
-                totalSprites: 8,
-                atraso: 5,
-            },
-            indoEsquerda: {
-                altura: 390,
-                totalSprites: 8,
-                atraso: 5,
-            },
-            paradoDireita: {
-                altura: 0,
-                totalSprites: 10,
-                atraso: 5,
-            },
-            paradoEsquerda: {
-                altura: 260,
-                totalSprites: 10,
-                atraso: 5,
-            },
-        }
+        Promise.all([
+        this.carregarFrames("png/sprites/personagem1/direita", 8),
+        this.carregarFrames("png/sprites/personagem1/esquerda", 8),
+        this.carregarFrames("png/sprites/personagem1/parado_direita", 10),
+        this.carregarFrames("png/sprites/personagem1/parado_esquerda", 10)
+        ]).then(([direita, esquerda, paradoDireita, paradoEsquerda]) => {
 
+            this.frames.indoDireita    = direita;
+            this.frames.indoEsquerda   = esquerda;
+            this.frames.paradoDireita  = paradoDireita;
+            this.frames.paradoEsquerda = paradoEsquerda;
+
+            this.frameSizes.indoDireita    = { w: 669, h: 569, offsetY: 65 };
+            this.frameSizes.indoEsquerda   = { w: 669, h: 569, offsetY: 65 };
+            this.frameSizes.paradoDireita  = { w: 669, h: 569, offsetY: 65 };
+            this.frameSizes.paradoEsquerda = { w: 669, h: 569, offsetY: 65 };
+
+            this.estado = "paradoDireita"; // Estado inicial
+            this.imgX = this.frameSizes.paradoDireita.w;
+            this.imgY = this.frameSizes.paradoDireita.h;
+
+            this.x = (this.telaWidth / 2) - ((this.imgX * this.scale) / 2);
+            this.y = this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (this.imgY * this.scale);
+        
+            this.imagensCarregadas = true;
+        });
+        
         // Caixa de colisão
         this.rect = { 
             x: this.x, 
             y: this.y, 
             width: this.imgX * this.scale, 
-            height: this.imgY * this.scale
+            height: this.imgY * this.scale 
         };
     }
 
-    desenhar(){
-        // Atualiza a posição da caixa de colisão
-        this.rect.x = this.x;
-        this.rect.y = this.y;
+    carregarFrames(caminhoBase, quantidade) {
+        const promessas = [];
 
-        //animação multimovimento
-        if (this.teclado.direita && this.teclado.esquerda){
-            switch (this.sprites.estadoAtual) {
-                case 2:
-                    this.animation(
-                        this.img, 
-                        this.sprites.paradoDireita.atraso, 
-                        this.sprites.paradoDireita.totalSprites, 
-                        this.sprites.paradoDireita.altura, 
-                        this.imgX, 
-                        this.imgY
-                    );
+        for (let i = 1; i <= quantidade; i++) {
+            promessas.push(new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = `${caminhoBase}/${i}.png`;
+            }));
+        }
+
+        return Promise.all(promessas);
+    }
+
+    desenhar() {
+        // Se ainda não carregou, não desenha nada
+        if (!this.imagensCarregadas) return;
+
+        // Lógica de multimovimento
+        if (this.teclado.direita && this.teclado.esquerda) {
+            switch (this.estado) {
+                case "indoDireita":
+                    this.estado = "paradoDireita";
                     break;
-                case -2:
-                    this.animation(
-                        this.img, 
-                        this.sprites.paradoEsquerda.atraso, 
-                        this.sprites.paradoEsquerda.totalSprites, 
-                        this.sprites.paradoEsquerda.altura, 
-                        this.imgX, 
-                        this.imgY
-                    );
+                case "indoEsquerda":
+                    this.estado = "paradoEsquerda";
                     break;
                 default:
-                    this.animation(
-                        this.img, 
-                        this.sprites.paradoDireita.atraso, 
-                        this.sprites.paradoDireita.totalSprites, 
-                        this.sprites.paradoDireita.altura, 
-                        this.imgX, 
-                        this.imgY
-                    );
                     break;
-            }  
-        }else{
-            //animação parado (estado inicial)
-            if (this.sprites.estadoAtual == 0){
-                this.animation(
-                    this.img, 
-                    this.sprites.paradoDireita.atraso, 
-                    this.sprites.paradoDireita.totalSprites, 
-                    this.sprites.paradoDireita.altura, 
-                    this.imgX, 
-                    this.imgY
-                );
             }
-
+        } else {
+            // Lógica de movimento
             switch (this.estadoTeclado) {
                 case "normal":
-                    //animação indo para direita
-                    if (this.teclado.direita){
+                    if (this.teclado.direita) {
                         this.x += this.velocidade;
-                        this.sprites.estadoAtual = 2;
-                        this.animation(
-                            this.img, 
-                            this.sprites.indoDireita.atraso, 
-                            this.sprites.indoDireita.totalSprites, 
-                            this.sprites.indoDireita.altura, 
-                            this.imgX, 
-                            this.imgY
-                        );
+                        this.estado = "indoDireita";
                     }
-                    //animação parado na direita
-                    if (!this.teclado.direita && this.sprites.estadoAtual == 2){
-                        this.animation(
-                            this.img, 
-                            this.sprites.paradoDireita.atraso, 
-                            this.sprites.paradoDireita.totalSprites, 
-                            this.sprites.paradoDireita.altura, 
-                            this.imgX, 
-                            this.imgY
-                        );
+                    if (!this.teclado.direita && this.estado === "indoDireita") {
+                        this.estado = "paradoDireita";
                     }
-                    //animação indo para esquerda
-                    if (this.teclado.esquerda){
+                    if (this.teclado.esquerda) {
                         this.x -= this.velocidade;
-                        this.sprites.estadoAtual = -2;
-                        this.animation(
-                            this.img, 
-                            this.sprites.indoEsquerda.atraso, 
-                            this.sprites.indoEsquerda.totalSprites, 
-                            this.sprites.indoEsquerda.altura, 
-                            this.imgX, 
-                            this.imgY
-                        );
+                        this.estado = "indoEsquerda";
                     }
-                    //animação parado na esquerda
-                    if (!this.teclado.esquerda && this.sprites.estadoAtual == -2){
-                        this.animation(
-                            this.img, 
-                            this.sprites.paradoEsquerda.atraso, 
-                            this.sprites.paradoEsquerda.totalSprites, 
-                            this.sprites.paradoEsquerda.altura, 
-                            this.imgX, 
-                            this.imgY
-                        );
+                    if (!this.teclado.esquerda && this.estado === "indoEsquerda") {
+                        this.estado = "paradoEsquerda";
                     }
                     break;
                 case "invertRightLeft":
                     if (this.teclado.direita) {
                         this.x -= this.velocidade;
-                        this.sprites.estadoAtual = -2;
-                        this.animation(
-                            this.img, 
-                            this.sprites.indoDireita.atraso, 
-                            this.sprites.indoDireita.totalSprites, 
-                            this.sprites.indoDireita.altura, 
-                            this.imgX, 
-                            this.imgY
-                        );
+                        this.estado = "indoEsquerda";
                     }
-
-                    if (!this.teclado.direita && this.sprites.estadoAtual == -2) {
-                        this.animation(
-                            this.img, 
-                            this.sprites.paradoDireita.atraso, 
-                            this.sprites.paradoDireita.totalSprites, 
-                            this.sprites.paradoDireita.altura, 
-                            this.imgX, 
-                            this.imgY
-                        );
+                    if (!this.teclado.direita && this.estado === "indoEsquerda") {
+                        this.estado = "paradoEsquerda";
                     }
-
                     if (this.teclado.esquerda) {
                         this.x += this.velocidade;
-                        this.sprites.estadoAtual = 2;
-                        this.animation(
-                            this.img, 
-                            this.sprites.indoEsquerda.atraso, 
-                            this.sprites.indoEsquerda.totalSprites, 
-                            this.sprites.indoEsquerda.altura, 
-                            this.imgX, 
-                            this.imgY
-                        );
+                        this.estado = "indoDireita";
                     }
-
-                    if (!this.teclado.esquerda && this.sprites.estadoAtual == 2) {
-                        this.animation(
-                            this.img, 
-                            this.sprites.paradoEsquerda.atraso, 
-                            this.sprites.paradoEsquerda.totalSprites, 
-                            this.sprites.paradoEsquerda.altura, 
-                            this.imgX, 
-                            this.imgY
-                        );
+                    if (!this.teclado.esquerda && this.estado === "indoDireita") {
+                        this.estado = "paradoDireita";
                     }
                     break;
-                default:
-                    break;
             }
-        }
-    }
-
-    animation(
-        img, 
-        atrasoSprite, 
-        totalSprite, 
-        ySprite, 
-        tamImgX, 
-        tamImgY,
-    ){
-        this.contadorAtraso++;
-
-        if (this.contadorAtraso >= atrasoSprite || this.numSprite > totalSprite - 1){
-            this.numSprite ++;
-            this.contadorAtraso = 0;
-
-            if (this.numSprite > totalSprite - 1){
-                this.numSprite = 0;
-            }
-            this.alternaSprite = this.numSprite * tamImgX;
         }
         
+        // Atualiza o tamanho da hitbox
+        const size = this.frameSizes[this.estado];
+
+        this.rect.width = size.w * this.scale;
+        this.rect.height = size.h * this.scale;
+        this.rect.x = this.x;
+        this.rect.y = this.y + (size.offsetY * this.scale);
+
+        this.animar();
+    }
+
+    animar() {
+        const atraso = 5;
+        const imagens = this.frames[this.estado];
+
+        this.contadorAtraso++;
+
+        if (this.contadorAtraso >= atraso) {
+            this.numFrame = (this.numFrame + 1) % imagens.length;
+            this.contadorAtraso = 0;
+            this.frameAtual = imagens[this.numFrame];
+        }
+
+        const frame = this.frameAtual || imagens[this.numFrame];
+        if (!(frame instanceof HTMLImageElement) || !frame.complete) return;
+
+        const size = this.frameSizes[this.estado];
+
         this.caneta.drawImage(
-            img, 
-            this.alternaSprite, 
-            ySprite, 
-            tamImgX, 
-            tamImgY, 
-            this.x, 
-            this.y, 
-            tamImgX * this.scale, 
-            tamImgY * this.scale
+            frame,
+            this.x,
+            this.y + (size.offsetY * this.scale),
+            size.w * this.scale,
+            size.h * this.scale
         );
     }
 
-    get getDescricao(){
-        return this.descricao;
+    // Getters e setters
+    get getDescricao() { return this.descricao; }
+    get getImgX() { return this.imgX; }
+    get getImgY() { return this.imgY; }
+    get getPosX() { return this.x; }
+    get getPosY() { return this.y; }
+    get getScale() { return this.scale; }
+    get getVelocidade() { return this.velocidade; }
+    get getRect() { return this.rect; }
+    get getEstadoTeclado() { return this.estadoTeclado; }
+    get getDropTipo() { return this.dropTipo; }
+
+    set setPosX(position) { this.x = position; }
+    set setPosY(position) { this.y = position; }
+    set setDropTipo(tipo) { this.dropTipo = tipo; }
+    
+    set setEstadoTeclado(estado) {
+        this.estadoTeclado = estado === "invertRightLeft" ? "invertRightLeft" : "normal";
     }
 
-    get getImgX(){
-        return this.imgX;
-    }
-
-    get getImgY(){
-        return this.imgY;
-    }
-
-    get getPosX(){
-        return this.x;
-    }
-
-    get getPosY(){
-        return this.y;
-    }
-
-    get getScale(){
-        return this.scale;
-    }
-
-    get getVelocidade(){
-        return this.velocidade;
-    }
-
-    get getRect(){
-        return this.rect;
-    }
-
-    get getEstadoTeclado(){
-        return this.estadoTeclado;
-    }
-
-    get getDropTipo(){
-        return this.dropTipo;
-    }
-
-    set setPosX(position){
-        this.x = position;
-    }
-
-    set setPosY(position){
-        this.y = position;
-    }
-
-    set setDropTipo(tipo){
-        this.dropTipo = tipo;
-    }
-
-    set setEstadoTeclado(estado){
-        switch (estado) {
-            case "normal":
-                this.estadoTeclado = "normal";
-                break;
-            case "invertRightLeft":
-                this.estadoTeclado = "invertRightLeft";
-                break;
-            default:
-                this.estadoTeclado = "normal";
-                break;
-        }
-    }
-
-    set setScale(scale){
-        // Limita o valor da escala
+    set setScale(scale) {
         if (scale < 0.05) scale = 0.05;
         if (scale > 6) scale = 6;
 
         const baseAntiga = this.y + (this.imgY * this.scale);
-
         this.scale = scale;
-
         const novaAltura = this.imgY * this.scale;
-
         this.y = baseAntiga - novaAltura;
 
-        // Atualiza a caixa de colisão
         this.rect.width = this.imgX * this.scale;
         this.rect.height = novaAltura;
         this.rect.x = this.x;
         this.rect.y = this.y;
     }
 
-    set setVelocidade(velocidade){
-        if (velocidade <= 0){
-            this.velocidade = 1;
-        }else{
-            this.velocidade = velocidade;
-        }
+    set setVelocidade(velocidade) {
+        this.velocidade = velocidade <= 0 ? 1 : velocidade;
     }
-
 }
