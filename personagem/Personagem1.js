@@ -6,13 +6,19 @@ class Personagem1 {
         this.terreno = terreno;
         this.telaWidth = tela.width;
         this.telaHeight = tela.height;
-
-        this.velocidade = 1.5;
-        this.scale = 0.20;
-        this.descricao = { tipo: "Comum", habilidade: "Nenhuma" };
         this.estadoTeclado = "normal";
         this.dropTipo = "";
 
+        // Atributos do personagem
+        this.velocidade = 1.5;
+        this.scale = 0.20;
+        this.descricao = { tipo: "Comum", habilidade: "Nenhuma" };
+
+        // Atributos da gravidade
+        this.velY = 0;
+        this.gravidade = 1;
+
+        // Animações
         this.frames = {};
         this.frameSizes = {};
         this.imagensCarregadas = false;
@@ -57,23 +63,20 @@ class Personagem1 {
         };
     }
 
-    carregarFrames(caminhoBase, quantidade) {
-        const promessas = [];
-
-        for (let i = 1; i <= quantidade; i++) {
-            promessas.push(new Promise(resolve => {
-                const img = new Image();
-                img.onload = () => resolve(img);
-                img.src = `${caminhoBase}/${i}.png`;
-            }));
-        }
-
-        return Promise.all(promessas);
-    }
-
     desenhar() {
         if (!this.imagensCarregadas) return;
         if (!this.visivel) return;
+
+        // Atualiza física da gravidade
+        this.velY += this.gravidade;
+        this.y += this.velY;
+
+        // Detecta o chão (base do terreno)
+        const pisoY = this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (this.imgY * this.scale);
+        if (this.y >= pisoY) {
+            this.y = pisoY;
+            this.velY = 0;
+        }
 
         // Lógica de multimovimento
         if (this.teclado.direita && this.teclado.esquerda) {
@@ -134,6 +137,20 @@ class Personagem1 {
         this.rect.y = this.y + (size.offsetY * this.scale);
 
         this.animar();
+    }
+
+    carregarFrames(caminhoBase, quantidade) {
+        const promessas = [];
+
+        for (let i = 1; i <= quantidade; i++) {
+            promessas.push(new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = `${caminhoBase}/${i}.png`;
+            }));
+        }
+
+        return Promise.all(promessas);
     }
 
     animar() {

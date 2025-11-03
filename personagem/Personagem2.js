@@ -6,13 +6,19 @@ class Personagem2 {
         this.terreno = terreno;
         this.telaWidth = tela.width;
         this.telaHeight = tela.height;
-
-        this.velocidade = 1.5;
-        this.scale = 0.20;
-        this.descricao = { tipo: "Zumbi", habilidade: "Teletransporte" };
         this.estadoTeclado = "normal";
         this.dropTipo = "";
 
+        // Atributos do personagem
+        this.velocidade = 1.5;
+        this.scale = 0.20;
+        this.descricao = { tipo: "Zumbi", habilidade: "Teletransporte" };
+
+        // Atributos da gravidade
+        this.velY = 0;
+        this.gravidade = 1;
+
+        // Animações
         this.frames = {};
         this.frameSizes = {};
         this.imagensCarregadas = false;
@@ -63,23 +69,20 @@ class Personagem2 {
         };
     }
 
-    carregarFrames(caminhoBase, quantidade) {
-        const promessas = [];
-
-        for (let i = 1; i <= quantidade; i++) {
-            promessas.push(new Promise(resolve => {
-                const img = new Image();
-                img.onload = () => resolve(img);
-                img.src = `${caminhoBase}/${i}.png`;
-            }));
-        }
-
-        return Promise.all(promessas);
-    }
-
     desenhar() {
         if (!this.imagensCarregadas) return;
         if (!this.visivel) return;
+
+        // Atualiza física da gravidade
+        this.velY += this.gravidade;
+        this.y += this.velY;
+
+        // Detecta o chão (base do terreno)
+        const pisoY = this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (this.imgY * this.scale);
+        if (this.y >= pisoY) {
+            this.y = pisoY;
+            this.velY = 0;
+        }
 
         // Lógica de multimovimento
         if (this.teclado.direita && this.teclado.esquerda) {
@@ -111,6 +114,12 @@ class Personagem2 {
                     if (!this.teclado.esquerda && this.estado === "indoEsquerda") {
                         this.estado = "paradoEsquerda";
                     }
+                    if (this.teclado.space && this.estado === "paradoDireita") {
+                        this.estado = "deadDireita";
+                    }
+                    if (this.teclado.space && this.estado === "paradoEsquerda") {
+                        this.estado = "deadEsquerda";
+                    }
                     break;
                 case "invertRightLeft":
                     if (this.teclado.direita) {
@@ -140,6 +149,20 @@ class Personagem2 {
         this.rect.y = this.y + (size.offsetY * this.scale);
 
         this.animar();
+    }
+
+    carregarFrames(caminhoBase, quantidade) {
+        const promessas = [];
+
+        for (let i = 1; i <= quantidade; i++) {
+            promessas.push(new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = `${caminhoBase}/${i}.png`;
+            }));
+        }
+
+        return Promise.all(promessas);
     }
 
     animar() {
