@@ -16,6 +16,7 @@ class Personagem1 {
         this.frames = {};
         this.frameSizes = {};
         this.imagensCarregadas = false;
+        this.visivel = true;
         this.frameAtual = null;
         this.numFrame = 0;
         this.contadorAtraso = 0;
@@ -71,8 +72,8 @@ class Personagem1 {
     }
 
     desenhar() {
-        // Se ainda não carregou, não desenha nada
         if (!this.imagensCarregadas) return;
+        if (!this.visivel) return;
 
         // Lógica de multimovimento
         if (this.teclado.direita && this.teclado.esquerda) {
@@ -176,6 +177,7 @@ class Personagem1 {
     set setPosX(position) { this.x = position; }
     set setPosY(position) { this.y = position; }
     set setDropTipo(tipo) { this.dropTipo = tipo; }
+    set setVisivel(visivel) { this.visivel = visivel; }
     
     set setEstadoTeclado(estado) {
         this.estadoTeclado = estado === "invertRightLeft" ? "invertRightLeft" : "normal";

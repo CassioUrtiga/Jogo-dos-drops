@@ -39,10 +39,11 @@ class Personagens{
         this.indiceAtual = (novoIndice >= this.indiceAtual) ? novoIndice + 1 : novoIndice;
 
         const novoPersonagem = this.personagens[this.indiceAtual]();
+        novoPersonagem.setVisivel = false;
         const antigo = this.personagemAtual;
 
         // Ajustar scale e posição assim que as imagens forem carregadas
-        const aplicarPosicao = () => {
+        const ajustarPersonagem = () => {
             novoPersonagem.setScale = antigo.getScale;
 
             const baseAntiga = antigo.getPosY + (antigo.getImgY * antigo.getScale);
@@ -52,19 +53,20 @@ class Personagens{
             novoPersonagem.setPosY = baseAntiga - novaAltura;
 
             novoPersonagem.setDropTipo = "";
+            novoPersonagem.setVisivel = true;
         };
 
         // Se já estiverem carregadas, aplica direto
         if (novoPersonagem.imagensCarregadas) {
-            aplicarPosicao();
+            ajustarPersonagem();
         } else {
             // Se ainda não carregou, aplica quando carregar
             const checarCarregamento = setInterval(() => {
                 if (novoPersonagem.imagensCarregadas) {
                     clearInterval(checarCarregamento);
-                    aplicarPosicao();
+                    ajustarPersonagem();
                 }
-            }, 2);
+            }, 50);
         }
 
         return novoPersonagem;
