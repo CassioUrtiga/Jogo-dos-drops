@@ -61,12 +61,16 @@ class Personagens{
             ajustarPersonagem();
         } else {
             // Se ainda não carregou, aplica quando carregar
-            const checarCarregamento = setInterval(() => {
+            const checarCarregamento = () => {
                 if (novoPersonagem.imagensCarregadas) {
-                    clearInterval(checarCarregamento);
                     ajustarPersonagem();
+                    return;
                 }
-            }, 50);
+                
+                requestAnimationFrame(checarCarregamento);
+            };
+
+            checarCarregamento();
         }
 
         return novoPersonagem;
