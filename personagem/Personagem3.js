@@ -19,6 +19,7 @@ class Personagem3 {
         this.gravidade = 1;
         this.forcaPulo = -20;
         this.noChao = true;
+        this.pulando = false;
 
         // Animações
         this.frames = {};
@@ -81,104 +82,111 @@ class Personagem3 {
 
         // Detecta o chão (base do terreno)
         const pisoY = this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (this.imgY * this.scale);
+
         if (this.y >= pisoY) {
             this.y = pisoY;
             this.velY = 0;
             this.noChao = true;
-            switch (this.estado) {
-                case "pularDireita":
-                    this.estado = "paradoDireita";
-                    break;
-                case "pularEsquerda":
-                    this.estado = "paradoEsquerda";
-                    break;
-                default:
-                    break;
-            }
+            this.pulando = false;
+
+            // Volta ao estado parado após o pulo
+            if (this.estado === "pularDireita") this.estado = "paradoDireita";
+            if (this.estado === "pularEsquerda") this.estado = "paradoEsquerda";
         }
 
-        // Lógica de multimovimento
-        if (this.teclado.direita && this.teclado.esquerda) {
-            switch (this.estado) {
-                case "indoDireita":
-                    this.estado = "paradoDireita";
-                    break;
-                case "indoEsquerda":
-                    this.estado = "paradoEsquerda";
-                    break;
-                default:
-                    break;
+        if (this.pulando) {
+            if (this.estado.includes("Direita")) {
+                this.estado = "pularDireita";
+            } else {
+                this.estado = "pularEsquerda";
             }
         } else {
-            // Lógica de movimento
-            switch (this.estadoTeclado) {
-                case "normal":
-                    if (this.teclado.direita) {
-                        this.x += this.velocidade;
-                        this.estado = "indoDireita";
-                    }
-                    if (!this.teclado.direita && this.estado === "indoDireita") {
+            // Lógica de multimovimento
+            if (this.teclado.direita && this.teclado.esquerda) {
+                switch (this.estado) {
+                    case "indoDireita":
                         this.estado = "paradoDireita";
-                    }
-                    if (this.teclado.esquerda) {
-                        this.x -= this.velocidade;
-                        this.estado = "indoEsquerda";
-                    }
-                    if (!this.teclado.esquerda && this.estado === "indoEsquerda") {
+                        break;
+                    case "indoEsquerda":
                         this.estado = "paradoEsquerda";
-                    }
-                    if (this.teclado.space && this.estado === "paradoDireita"){
-                        this.estado = "pularDireita";
-                        this.pular();
-                    }
-                    if (this.teclado.space && this.estado === "indoDireita"){
-                        this.estado = "pularDireita";
-                        this.pular();
-                    }
-                    if (this.teclado.space && this.estado === "paradoEsquerda"){
-                        this.estado = "pularEsquerda";
-                        this.pular();
-                    }
-                    if (this.teclado.space && this.estado === "indoEsquerda"){
-                        this.estado = "pularEsquerda";
-                        this.pular();
-                    }
-                    break;
-                case "invertRightLeft":
-                    if (this.teclado.direita) {
-                        this.x -= this.velocidade;
-                        this.estado = "indoEsquerda";
-                    }
-                    if (!this.teclado.direita && this.estado === "indoEsquerda") {
-                        this.estado = "paradoEsquerda";
-                    }
-                    if (this.teclado.esquerda) {
-                        this.x += this.velocidade;
-                        this.estado = "indoDireita";
-                    }
-                    if (!this.teclado.esquerda && this.estado === "indoDireita") {
-                        this.estado = "paradoDireita";
-                    }
-                    if (this.teclado.space && this.estado === "paradoDireita"){
-                        this.estado = "pularDireita";
-                        this.pular();
-                    }
-                    if (this.teclado.space && this.estado === "indoDireita"){
-                        this.estado = "pularDireita";
-                        this.pular();
-                    }
-                    if (this.teclado.space && this.estado === "paradoEsquerda"){
-                        this.estado = "pularEsquerda";
-                        this.pular();
-                    }
-                    if (this.teclado.space && this.estado === "indoEsquerda"){
-                        this.estado = "pularEsquerda";
-                        this.pular();
-                    }
-                    break;
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                // Lógica de movimento
+                switch (this.estadoTeclado) {
+                    case "normal":
+                        if (this.teclado.direita) {
+                            this.x += this.velocidade;
+                            this.estado = "indoDireita";
+                        }
+                        if (!this.teclado.direita && this.estado === "indoDireita") {
+                            this.estado = "paradoDireita";
+                        }
+                        if (this.teclado.esquerda) {
+                            this.x -= this.velocidade;
+                            this.estado = "indoEsquerda";
+                        }
+                        if (!this.teclado.esquerda && this.estado === "indoEsquerda") {
+                            this.estado = "paradoEsquerda";
+                        }
+                        if (this.teclado.space && this.estado === "paradoDireita"){
+                            this.estado = "pularDireita";
+                            this.pulando = true;
+                            this.pular();
+                        }
+                        if (this.teclado.space && this.estado === "indoDireita"){
+                            this.estado = "pularDireita";
+                            this.pulando = true;
+                            this.pular();
+                        }
+                        if (this.teclado.space && this.estado === "paradoEsquerda"){
+                            this.estado = "pularEsquerda";
+                            this.pulando = true;
+                            this.pular();
+                        }
+                        if (this.teclado.space && this.estado === "indoEsquerda"){
+                            this.estado = "pularEsquerda";
+                            this.pulando = true;
+                            this.pular();
+                        }
+                        break;
+                    case "invertRightLeft":
+                        if (this.teclado.direita) {
+                            this.x -= this.velocidade;
+                            this.estado = "indoEsquerda";
+                        }
+                        if (!this.teclado.direita && this.estado === "indoEsquerda") {
+                            this.estado = "paradoEsquerda";
+                        }
+                        if (this.teclado.esquerda) {
+                            this.x += this.velocidade;
+                            this.estado = "indoDireita";
+                        }
+                        if (!this.teclado.esquerda && this.estado === "indoDireita") {
+                            this.estado = "paradoDireita";
+                        }
+                        if (this.teclado.space && this.estado === "paradoDireita"){
+                            this.estado = "pularDireita";
+                            this.pular();
+                        }
+                        if (this.teclado.space && this.estado === "indoDireita"){
+                            this.estado = "pularDireita";
+                            this.pular();
+                        }
+                        if (this.teclado.space && this.estado === "paradoEsquerda"){
+                            this.estado = "pularEsquerda";
+                            this.pular();
+                        }
+                        if (this.teclado.space && this.estado === "indoEsquerda"){
+                            this.estado = "pularEsquerda";
+                            this.pular();
+                        }
+                        break;
+                }
             }
         }
-        
         // Atualiza o tamanho da hitbox
         const size = this.frameSizes[this.estado];
 

@@ -73,6 +73,7 @@ class Personagem1 {
 
         // Detecta o chão (base do terreno)
         const pisoY = this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (this.imgY * this.scale);
+        
         if (this.y >= pisoY) {
             this.y = pisoY;
             this.velY = 0;
