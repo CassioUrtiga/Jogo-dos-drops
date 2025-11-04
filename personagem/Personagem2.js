@@ -79,6 +79,7 @@ class Personagem2 {
 
         // Detecta o chão (base do terreno)
         const pisoY = this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (this.imgY * this.scale);
+        
         if (this.y >= pisoY) {
             this.y = pisoY;
             this.velY = 0;
@@ -114,11 +115,27 @@ class Personagem2 {
                     if (!this.teclado.esquerda && this.estado === "indoEsquerda") {
                         this.estado = "paradoEsquerda";
                     }
-                    if (this.teclado.space && this.estado === "paradoDireita") {
-                        this.estado = "deadDireita";
-                    }
-                    if (this.teclado.space && this.estado === "paradoEsquerda") {
-                        this.estado = "deadEsquerda";
+                    if (
+                        this.teclado.space && !this.executandoDead && this.estado === "paradoDireita" ||
+                        this.teclado.space && !this.executandoDead && this.estado === "paradoEsquerda"
+                    ) {
+                        this.executandoDead = true;
+
+                        if (this.estado === "paradoDireita" || this.estado === "indoDireita") {
+                            this.estado = "deadDireita";
+                        } else if (this.estado === "paradoEsquerda" || this.estado === "indoEsquerda") {
+                            this.estado = "deadEsquerda";
+                        }
+
+                        this.numFrame = 0;
+
+                        const imagens = this.frames[this.estado];
+                        const duracao = imagens.length * 70;
+
+                        setTimeout(() => {
+                            this.teletransportar();
+                            this.executandoDead = false;
+                        }, duracao);
                     }
                     break;
                 case "invertRightLeft":
@@ -135,6 +152,28 @@ class Personagem2 {
                     }
                     if (!this.teclado.esquerda && this.estado === "indoDireita") {
                         this.estado = "paradoDireita";
+                    }
+                    if (
+                        this.teclado.space && !this.executandoDead && this.estado === "paradoDireita" ||
+                        this.teclado.space && !this.executandoDead && this.estado === "paradoEsquerda"
+                    ) {
+                        this.executandoDead = true;
+
+                        if (this.estado === "paradoDireita" || this.estado === "indoDireita") {
+                            this.estado = "deadDireita";
+                        } else if (this.estado === "paradoEsquerda" || this.estado === "indoEsquerda") {
+                            this.estado = "deadEsquerda";
+                        }
+
+                        this.numFrame = 0;
+
+                        const imagens = this.frames[this.estado];
+                        const duracao = imagens.length * 70;
+
+                        setTimeout(() => {
+                            this.teletransportar();
+                            this.executandoDead = false;
+                        }, duracao);
                     }
                     break;
             }
@@ -190,6 +229,32 @@ class Personagem2 {
             size.h * this.scale
         );
     }
+
+    teletransportar() {
+        const escolha = Math.floor(Math.random() * 3);
+
+        switch (escolha) {
+            case 0: // início
+                this.x = 0 + (this.imgX * this.scale) / 2;
+                break;
+            case 1: // meio
+                this.x = (this.telaWidth / 2) - (this.imgX * this.scale) / 2;
+                break;
+            case 2: // fim
+                this.x = this.telaWidth - (this.imgX * this.scale);
+                break;
+        }
+
+        if (this.estado.includes("Direita")) {
+            this.estado = "paradoDireita";
+        } else {
+            this.estado = "paradoEsquerda";
+        }
+
+        const pisoY = this.telaHeight - (this.terreno.getTamImgY * this.terreno.getScale) - (this.imgY * this.scale);
+        this.y = pisoY;
+    }
+
 
     // Getters e setters
     get getDescricao() { return this.descricao; }
